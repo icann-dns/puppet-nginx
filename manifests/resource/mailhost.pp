@@ -17,7 +17,9 @@
 # @param ipv6_listen_port
 #   Default IPv6 Port for NGINX to listen with this server on.
 # @param ipv6_listen_options
-#   Extra options for listen directive like 'default' to catchall.
+#   Extra options for listen directive like 'default' to catchall. Defaults to
+#   'ipv6only=on'. If listen_options is set, those options are inherited with
+#   'ipv6only=on' appended.
 # @param ssl
 #   Indicates whether to setup SSL bindings for this mailhost.
 # @param ssl_cert
@@ -137,7 +139,7 @@ define nginx::resource::mailhost (
   Boolean $ipv6_enable                           = false,
   Variant[Array[String], String] $ipv6_listen_ip = '::',
   Stdlib::Port $ipv6_listen_port                 = $listen_port,
-  String $ipv6_listen_options                    = 'default ipv6only=on',
+  Optional[String[1]] $ipv6_listen_options       = undef,
   Boolean $ssl                                   = false,
   Optional[String] $ssl_cert                     = undef,
   String $ssl_ciphers                            = $nginx::ssl_ciphers,
@@ -219,6 +221,18 @@ define nginx::resource::mailhost (
   $has_ipaddress6 = ($facts.get('networking.ip6') =~ Stdlib::IP::Address::V6)
   if ($ipv6_enable and !$has_ipaddress6) {
     warning('nginx: IPv6 support is not enabled or configured properly')
+  }
+
+  # Compute effective ipv6_listen_options:
+  # - Use ipv6_listen_options if set
+  # - Otherwise use listen_options with ipv6only=on appended
+  # - Otherwise use 'ipv6only=on'
+  $_ipv6_listen_options = $ipv6_listen_options ? {
+    undef   => $listen_options ? {
+      undef   => 'ipv6only=on',
+      default => "${listen_options} ipv6only=on",
+    },
+    default => $ipv6_listen_options,
   }
 
   if $ipv6_enable and $has_ipaddress6 {
@@ -310,7 +324,7 @@ define nginx::resource::mailhost (
       content => epp('nginx/mailhost/mailhost.epp',
         {
           ipv6_listen_ip        => $_ipv6_listen_ip,
-          ipv6_listen_options   => $ipv6_listen_options,
+          ipv6_listen_options   => $_ipv6_listen_options,
           ipv6_listen_port      => $ipv6_listen_port,
           listen_ip             => Array($listen_ip, true),
           listen_options        => $listen_options,
@@ -334,7 +348,7 @@ define nginx::resource::mailhost (
       content => epp('nginx/mailhost/mailhost_ssl.epp',
         {
           ipv6_listen_ip        => $_ipv6_listen_ip,
-          ipv6_listen_options   => $ipv6_listen_options,
+          ipv6_listen_options   => $_ipv6_listen_options,
           ipv6_listen_port      => $ipv6_listen_port,
           listen_ip             => Array($listen_ip, true),
           listen_options        => $listen_options,

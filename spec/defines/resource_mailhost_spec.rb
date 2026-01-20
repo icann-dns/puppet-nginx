@@ -66,25 +66,25 @@ describe 'nginx::resource::mailhost' do
               title: 'should enable IPv6',
               attr: 'ipv6_enable',
               value: true,
-              match: '  listen                [::]:25 default ipv6only=on;'
+              match: '  listen                [::]:25 ipv6only=on;'
             },
             {
               title: 'should not enable IPv6',
               attr: 'ipv6_enable',
               value: false,
-              notmatch: %r{  listen                \[::\]:25 default ipv6only=on;}
+              notmatch: %r{  listen                \[::\]:25 ipv6only=on;}
             },
             {
               title: 'should set the IPv6 listen IP',
               attr: 'ipv6_listen_ip',
               value: '2001:0db8:85a3:0000:0000:8a2e:0370:7334',
-              match: '  listen                [2001:0db8:85a3:0000:0000:8a2e:0370:7334]:25 default ipv6only=on;'
+              match: '  listen                [2001:0db8:85a3:0000:0000:8a2e:0370:7334]:25 ipv6only=on;'
             },
             {
               title: 'should set the IPv6 listen port',
               attr: 'ipv6_listen_port',
               value: 45,
-              match: '  listen                [::]:45 default ipv6only=on;'
+              match: '  listen                [::]:45 ipv6only=on;'
             },
             {
               title: 'should set the IPv6 listen options',
@@ -242,6 +242,40 @@ describe 'nginx::resource::mailhost' do
               end
             end
           end
+
+          describe 'ipv6_listen_options inheritance from listen_options' do
+            let :default_params do
+              {
+                listen_port: 25,
+                ipv6_enable: true
+              }
+            end
+
+            context 'when listen_options is set but ipv6_listen_options is not' do
+              let(:params) { default_params.merge(listen_options: 'reuseport') }
+
+              it 'inherits listen_options with ipv6only=on appended' do
+                is_expected.to contain_concat__fragment("#{title}-header").with_content(%r{\s+listen\s+\[::\]:25 reuseport ipv6only=on;})
+              end
+            end
+
+            context 'when both listen_options and ipv6_listen_options are set' do
+              let(:params) { default_params.merge(listen_options: 'reuseport', ipv6_listen_options: 'default') }
+
+              it 'uses explicit ipv6_listen_options' do
+                is_expected.to contain_concat__fragment("#{title}-header").with_content(%r{\s+listen\s+\[::\]:25 default;})
+              end
+            end
+
+            context 'when neither listen_options nor ipv6_listen_options is set' do
+              let(:params) { default_params }
+
+              it 'uses ipv6only=on' do
+                is_expected.to contain_concat__fragment("#{title}-header").with_content(%r{\s+listen\s+\[::\]:25 ipv6only=on;})
+              end
+            end
+          end
+
           context 'mail proxy parameters' do
             let(:pre_condition) { ['class { "nginx": nginx_version => "1.20.0", mail => true,}'] }
             let(:params) do
@@ -559,25 +593,25 @@ describe 'nginx::resource::mailhost' do
               title: 'should enable IPv6',
               attr: 'ipv6_enable',
               value: true,
-              match: '  listen                [::]:587 ssl default ipv6only=on;'
+              match: '  listen                [::]:587 ssl ipv6only=on;'
             },
             {
               title: 'should not enable IPv6',
               attr: 'ipv6_enable',
               value: false,
-              notmatch: %r{  listen\s+\[::\]:587 default ipv6only=on;}
+              notmatch: %r{  listen\s+\[::\]:587 ;}
             },
             {
               title: 'should set the IPv6 listen IP',
               attr: 'ipv6_listen_ip',
               value: '2001:0db8:85a3:0000:0000:8a2e:0370:7334',
-              match: '  listen                [2001:0db8:85a3:0000:0000:8a2e:0370:7334]:587 ssl default ipv6only=on;'
+              match: '  listen                [2001:0db8:85a3:0000:0000:8a2e:0370:7334]:587 ssl ipv6only=on;'
             },
             {
               title: 'should set the IPv6 ssl port',
               attr: 'ssl_port',
               value: 45,
-              match: '  listen                [::]:45 ssl default ipv6only=on;'
+              match: '  listen                [::]:45 ssl ipv6only=on;'
             },
             {
               title: 'should set the IPv6 listen options',
@@ -698,7 +732,7 @@ describe 'nginx::resource::mailhost' do
 
               it 'contains `ssl` in the listen directive for ipv6' do
                 content = catalogue.resource('concat::fragment', "#{title}-ssl").send(:parameters)[:content]
-                expect(content).to include('listen                [::]:587 ssl default ipv6only=on;')
+                expect(content).to include('listen                [::]:587 ssl ipv6only=on;')
               end
             end
 
@@ -712,7 +746,7 @@ describe 'nginx::resource::mailhost' do
 
               it 'contains `ssl` in the listen directive for ipv6' do
                 content = catalogue.resource('concat::fragment', "#{title}-ssl").send(:parameters)[:content]
-                expect(content).to include('listen                [::]:587 ssl default ipv6only=on;')
+                expect(content).to include('listen                [::]:587 ssl ipv6only=on;')
               end
             end
 
@@ -845,12 +879,12 @@ describe 'nginx::resource::mailhost' do
 
           it do
             is_expected.to contain_concat__fragment("#{title}-header").
-              without_content(%r{^  listen                \[::\]:25 default ipv6only=on;})
+              without_content(%r{^  listen                \[::\]:25 ipv6only=on;})
           end
 
           it do
             is_expected.to contain_concat__fragment("#{title}-ssl").
-              without_content(%r{^  listen                \[::\]:587 default ipv6only=on;})
+              without_content(%r{^  listen                \[::\]:587 ipv6only=on;})
           end
         end
       end
