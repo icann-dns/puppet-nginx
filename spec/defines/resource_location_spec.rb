@@ -244,6 +244,78 @@ describe 'nginx::resource::location' do
               match: %r{\s+auth_request\s+value;}
             },
             {
+              title: 'should not set client_max_body_size by default',
+              attr: 'client_max_body_size',
+              value: :undef,
+              notmatch: %r{client_max_body_size}
+            },
+            {
+              title: 'should set client_max_body_size',
+              attr: 'client_max_body_size',
+              value: '100m',
+              match: %r{\s+client_max_body_size\s+100m;}
+            },
+            {
+              title: 'should set client_max_body_size with bytes',
+              attr: 'client_max_body_size',
+              value: '1048576',
+              match: %r{\s+client_max_body_size\s+1048576;}
+            },
+            {
+              title: 'should not set client_body_timeout by default',
+              attr: 'client_body_timeout',
+              value: :undef,
+              notmatch: %r{client_body_timeout}
+            },
+            {
+              title: 'should set client_body_timeout',
+              attr: 'client_body_timeout',
+              value: '120s',
+              match: %r{\s+client_body_timeout\s+120s;}
+            },
+            {
+              title: 'should set client_body_timeout with minutes',
+              attr: 'client_body_timeout',
+              value: '2m',
+              match: %r{\s+client_body_timeout\s+2m;}
+            },
+            {
+              title: 'should not set client_body_buffer_size by default',
+              attr: 'client_body_buffer_size',
+              value: :undef,
+              notmatch: %r{client_body_buffer_size}
+            },
+            {
+              title: 'should set client_body_buffer_size',
+              attr: 'client_body_buffer_size',
+              value: '256k',
+              match: %r{\s+client_body_buffer_size\s+256k;}
+            },
+            {
+              title: 'should set client_body_buffer_size with megabytes',
+              attr: 'client_body_buffer_size',
+              value: '1m',
+              match: %r{\s+client_body_buffer_size\s+1m;}
+            },
+            {
+              title: 'should not set send_timeout by default',
+              attr: 'send_timeout',
+              value: :undef,
+              notmatch: %r{\bsend_timeout\b}
+            },
+            {
+              title: 'should set send_timeout',
+              attr: 'send_timeout',
+              value: '90s',
+              match: %r{\s+send_timeout\s+90s;}
+            },
+            {
+              title: 'should set send_timeout with minutes',
+              attr: 'send_timeout',
+              value: '5m',
+              match: %r{\s+send_timeout\s+5m;}
+            },
+            {
               title: 'should set reset_timedout_connection',
               attr: 'reset_timedout_connection',
               value: 'on',

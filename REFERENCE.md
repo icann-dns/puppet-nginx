@@ -1980,6 +1980,10 @@ The following parameters are available in the `nginx::resource::location` define
 * [`auth_basic`](#-nginx--resource--location--auth_basic)
 * [`auth_basic_user_file`](#-nginx--resource--location--auth_basic_user_file)
 * [`auth_request`](#-nginx--resource--location--auth_request)
+* [`client_max_body_size`](#-nginx--resource--location--client_max_body_size)
+* [`client_body_timeout`](#-nginx--resource--location--client_body_timeout)
+* [`client_body_buffer_size`](#-nginx--resource--location--client_body_buffer_size)
+* [`send_timeout`](#-nginx--resource--location--send_timeout)
 * [`priority`](#-nginx--resource--location--priority)
 * [`mp4`](#-nginx--resource--location--mp4)
 * [`flv`](#-nginx--resource--location--flv)
@@ -2549,6 +2553,38 @@ Default value: `undef`
 Data type: `Optional[String]`
 
 This allows you to specify a custom auth endpoint
+
+Default value: `undef`
+
+##### <a name="-nginx--resource--location--client_max_body_size"></a>`client_max_body_size`
+
+Data type: `Optional[Nginx::Size]`
+
+Sets the maximum allowed size of the client request body.
+
+Default value: `undef`
+
+##### <a name="-nginx--resource--location--client_body_timeout"></a>`client_body_timeout`
+
+Data type: `Optional[Nginx::Time]`
+
+Defines a timeout for reading client request body.
+
+Default value: `undef`
+
+##### <a name="-nginx--resource--location--client_body_buffer_size"></a>`client_body_buffer_size`
+
+Data type: `Optional[Nginx::Size]`
+
+Sets buffer size for reading client request body.
+
+Default value: `undef`
+
+##### <a name="-nginx--resource--location--send_timeout"></a>`send_timeout`
+
+Data type: `Optional[Nginx::Time]`
+
+Sets a timeout for transmitting a response to the client.
 
 Default value: `undef`
 

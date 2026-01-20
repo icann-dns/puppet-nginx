@@ -160,6 +160,14 @@
 #   This directive sets the htpasswd filename for the authentication realm.
 # @param auth_request
 #   This allows you to specify a custom auth endpoint
+# @param client_max_body_size
+#   Sets the maximum allowed size of the client request body.
+# @param client_body_timeout
+#   Defines a timeout for reading client request body.
+# @param client_body_buffer_size
+#   Sets buffer size for reading client request body.
+# @param send_timeout
+#   Sets a timeout for transmitting a response to the client.
 # @param priority
 #   Location priority. User priority 401-499, 501-599. If the priority is
 #   higher than the default priority (500), the location will be defined after
@@ -319,6 +327,10 @@ define nginx::resource::location (
   Optional[String] $auth_basic                                     = undef,
   Optional[String] $auth_basic_user_file                           = undef,
   Optional[String] $auth_request                                   = undef,
+  Optional[Nginx::Size] $client_max_body_size                      = undef,
+  Optional[Nginx::Time] $client_body_timeout                       = undef,
+  Optional[Nginx::Size] $client_body_buffer_size                   = undef,
+  Optional[Nginx::Time] $send_timeout                              = undef,
   Array $rewrite_rules                                             = [],
   Integer[401, 599] $priority                                      = 500,
   Boolean $mp4                                                     = false,

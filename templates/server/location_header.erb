@@ -37,6 +37,18 @@
 <%- if defined? @auth_request -%>
   auth_request <%= @auth_request %>;
   <%- end -%>
+<% if @client_max_body_size -%>
+    client_max_body_size <%= @client_max_body_size %>;
+<% end -%>
+<% if @client_body_timeout -%>
+    client_body_timeout <%= @client_body_timeout %>;
+<% end -%>
+<% if @client_body_buffer_size -%>
+    client_body_buffer_size <%= @client_body_buffer_size %>;
+<% end -%>
+<% if @send_timeout -%>
+    send_timeout <%= @send_timeout %>;
+<% end -%>
 <% if @location_custom_cfg_prepend -%>
   <%- @location_custom_cfg_prepend.each do |key,value| -%>
     <%- if value.is_a?(Hash) -%>
